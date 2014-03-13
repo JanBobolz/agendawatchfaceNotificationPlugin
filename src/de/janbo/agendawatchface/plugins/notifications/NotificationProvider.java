@@ -17,7 +17,7 @@ public class NotificationProvider extends AgendaWatchfacePlugin {
 	}
 
 	@Override
-	public void onRefreshRequest(Context context) {
+	public void onRefreshRequest(Context context) { //we delegate the fetching of AgendaItems to the NotificationService
 		Intent intent = new Intent(context, AgendaNotificationService.class);
 		intent.setAction(AgendaNotificationService.INTENT_ACTION_REFRESH);
 		context.startService(intent);
@@ -25,7 +25,9 @@ public class NotificationProvider extends AgendaWatchfacePlugin {
 
 	@Override
 	public void onShowSettingsRequest(Context context) {
-
+		Intent intent = new Intent(context, SettingsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
 	}
 
 }
