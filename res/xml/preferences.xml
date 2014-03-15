@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <CheckBoxPreference android:summaryOn="Watch will vibrate on new notifications" android:summaryOff="Watch will not vibrate" android:defaultValue="false" android:key="pref_key_vibrate" android:title="Vibrate"/><Preference android:key="pref_key_add_rule" android:summary="Adds a rule below" android:title="Add rule"/><PreferenceCategory android:key="pref_category_rules" android:title="Rules"></PreferenceCategory>
+    <Preference android:title="Important: Allow notification access" android:summary="Otherwise, no notifications can be shown" android:key="pref_key_notification_access"/><CheckBoxPreference android:summaryOn="Watch will vibrate on new notifications" android:summaryOff="Watch will not vibrate" android:defaultValue="false" android:key="pref_key_vibrate" android:title="Vibrate"/><Preference android:key="pref_key_add_rule" android:summary="Adds a rule below" android:title="Add rule"/><PreferenceCategory android:key="pref_category_rules" android:title="Rules"></PreferenceCategory>
+    
     
     
     

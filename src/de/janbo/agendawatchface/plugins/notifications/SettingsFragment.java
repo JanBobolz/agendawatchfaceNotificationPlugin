@@ -37,6 +37,15 @@ public class SettingsFragment extends PreferenceFragment {
 		root = getPreferenceScreen();
 		final SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 		
+		//Notification access
+		findPreference("pref_key_notification_access").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
+				startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+				return true;
+			}
+		});
+		
+		//Rules
 		nextRuleNum = prefs.getInt("last_rule_num", 1)+1;
 		findPreference("pref_key_add_rule").setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override

@@ -73,6 +73,7 @@ public class AgendaNotificationService extends NotificationListenerService {
 						item.line2.text = item.line2.text.replace('\n', ' '); //Pebble doesn't seem to handle newlines well...
 					}
 					
+					item.priority = 100;
 					items.add(item);
 				}
 			}
