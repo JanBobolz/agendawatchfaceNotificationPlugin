@@ -4,20 +4,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.EditTextPreference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 public class SettingsFragment extends PreferenceFragment {
@@ -50,7 +47,7 @@ public class SettingsFragment extends PreferenceFragment {
 				Editor edit = prefs.edit();
 				edit.putStringSet("rules", stringset);
 				edit.putInt("last_rule_num", nextRuleNum++);
-				edit.commit();
+				edit.apply();
 				
 				recreateRules();
 				return true;
@@ -85,7 +82,7 @@ public class SettingsFragment extends PreferenceFragment {
 		//Name
 		EditTextPreference namePref = new EditTextPreference(getActivity());
 		namePref.setKey("pref_rule_"+rule+"_name");
-		namePref.setTitle("Name");
+		namePref.setTitle("Rule name");
 		namePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				prefs.edit().putString("pref_rule_"+rule+"_name", (String) newValue).apply();
@@ -94,6 +91,23 @@ public class SettingsFragment extends PreferenceFragment {
 			}
 		});
 		screen.addPreference(namePref);
+		
+		//Package name matching
+		EditTextPreference packageRegex = new EditTextPreference(getActivity());
+		packageRegex.setKey("pref_rule_"+rule+"_package_regex");
+		packageRegex.setTitle("Package inclusion regex");
+		packageRegex.setSummary("e.g., \"k9\" or \"wunderlist|android\\.keep\" or \".*\" (without the quotes)");
+		screen.addPreference(packageRegex);
+		
+		//Rule action
+		ListPreference action = new ListPreference(getActivity());
+		action.setKey("pref_rule_"+rule+"_action");
+		action.setTitle("Rule action");
+		action.setSummary("What should happen if this rule is the first one that applies?");
+		action.setEntries(new CharSequence[] {"Ignore notification", "Show notification"});
+		action.setEntryValues(new CharSequence[] {"ignore", "show"});
+		action.setDefaultValue("show");
+		screen.addPreference(action);
 		
 		//Delete rule
 		Preference removePref = new Preference(getActivity());
