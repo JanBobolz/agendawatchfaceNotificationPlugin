@@ -63,12 +63,16 @@ public class AgendaNotificationService extends NotificationListenerService {
 					AgendaItem item = new AgendaItem(provider.getPluginId());
 					Bundle extras = notification.getNotification().extras;
 					item.line1.text = extras.getCharSequence(Notification.EXTRA_TITLE, "").toString();
-					if (!item.line1.text.isEmpty())
-						item.line1.text += ": ";
-					item.line1.text += extras.getCharSequence(Notification.EXTRA_TEXT, "");
 					item.line1.timeDisplay = TimeDisplayType.NONE;
-					item.line2 = null;
-
+					item.line1.text = item.line1.text.replace('\n', ' ');
+					
+					if (!extras.getCharSequence(Notification.EXTRA_TEXT, "").toString().isEmpty()) {
+						item.line2 = new AgendaItem.Line();
+						item.line2.text = extras.getCharSequence(Notification.EXTRA_TEXT, "").toString();
+						item.line2.timeDisplay = TimeDisplayType.NONE;
+						item.line2.text = item.line2.text.replace('\n', ' '); //Pebble doesn't seem to handle newlines well...
+					}
+					
 					items.add(item);
 				}
 			}
