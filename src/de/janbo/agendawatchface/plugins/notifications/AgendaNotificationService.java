@@ -1,6 +1,7 @@
 package de.janbo.agendawatchface.plugins.notifications;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Pattern;
@@ -23,6 +24,9 @@ public class AgendaNotificationService extends NotificationListenerService {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent == null)
+			return super.onStartCommand(intent, flags, startId);
+		
 		int returnVal = super.onStartCommand(intent, flags, startId);
 		if (INTENT_ACTION_REFRESH.equals(intent.getAction())) {
 			publishNotificationsToAgenda();
@@ -82,7 +86,13 @@ public class AgendaNotificationService extends NotificationListenerService {
 			vibrate = false; //don't vibrate next time unless a new notification is posted. 
 		} catch (RuntimeException e) {
 			Log.e("AgendaNotificationService", "Error retrieving notifications. Try re-allowing the app to read notifications", e);
-			provider.publishData(getApplicationContext(), new ArrayList<AgendaItem>(), false);
+			AgendaItem errorItem = new AgendaItem(provider.getPluginId());
+			errorItem.line1.text = "Plugin needs notification access";
+			errorItem.line2 = new AgendaItem.Line();
+			errorItem.line2.text = "Please visit the settings";
+			errorItem.line1.timeDisplay = errorItem.line2.timeDisplay = TimeDisplayType.NONE;
+			
+			provider.publishData(getApplicationContext(), new ArrayList<AgendaItem>(Arrays.asList(new AgendaItem[] {errorItem})), false);
 		}
 	}
 
