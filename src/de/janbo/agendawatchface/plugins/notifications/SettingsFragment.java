@@ -105,7 +105,7 @@ public class SettingsFragment extends PreferenceFragment {
 		EditTextPreference packageRegex = new EditTextPreference(getActivity());
 		packageRegex.setKey("pref_rule_"+rule+"_package_regex");
 		packageRegex.setTitle("Package inclusion regex");
-		packageRegex.setSummary("e.g., \"k9\" or \"wunderlist|android\\.keep\" or \".*\" (without the quotes)");
+		packageRegex.setSummary("(Part of) a package name (e.g., com.wunderkinder.wunderlistandroid) to match");
 		screen.addPreference(packageRegex);
 		
 		//Rule action

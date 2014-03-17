@@ -37,30 +37,15 @@ public class AgendaNotificationService extends NotificationListenerService {
 	private void publishNotificationsToAgenda() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
-		ArrayList<String> rules = new ArrayList<String>(prefs.getStringSet("rules", new HashSet<String>()));
-		Collections.sort(rules);
-		
-		//Compile regex patterns for inclusion
-		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
-		for (int i=0; i<rules.size(); i++)
-			patterns.add(Pattern.compile(".*("+prefs.getString("pref_rule_"+rules.get(i)+"_package_regex", "")+").*", Pattern.CASE_INSENSITIVE));
 		
 		//Collect notification items
 		ArrayList<AgendaItem> items = new ArrayList<AgendaItem>();
 		NotificationProvider provider = new NotificationProvider();
 		try {
 			for (StatusBarNotification notification : getActiveNotifications()) {
-				//Choose first fitting rule
-				String rule = "noRule";
-				int i;
-				for (i=0;i<rules.size();i++) {
-					rule = rules.get(i);
-					if (patterns.get(i).matcher(notification.getPackageName()).matches()) //rule doesn't fit
-						break;
-				}
-				
+				String rule = getFirstMatchingRule(notification);
 				//Handle notification according to rule
-				if (i<rules.size()) { //i and rule contain first matching rule
+				if (rule != null) {
 					if (prefs.getString("pref_rule_"+rule+"_action", "show").equals("ignore"))
 						continue;
 					
@@ -95,11 +80,35 @@ public class AgendaNotificationService extends NotificationListenerService {
 			provider.publishData(getApplicationContext(), new ArrayList<AgendaItem>(Arrays.asList(new AgendaItem[] {errorItem})), false);
 		}
 	}
+	
+	private String getFirstMatchingRule(StatusBarNotification sbn) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		ArrayList<String> rules = new ArrayList<String>(prefs.getStringSet("rules", new HashSet<String>()));
+		Collections.sort(rules);
+		
+		//Compile regex patterns for inclusion
+		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		for (int i=0; i<rules.size(); i++)
+			patterns.add(Pattern.compile(".*("+prefs.getString("pref_rule_"+rules.get(i)+"_package_regex", "")+").*", Pattern.CASE_INSENSITIVE));
+
+		//Choose first fitting rule
+		String rule = "noRule";
+		for (int i=0;i<rules.size();i++) {
+			rule = rules.get(i);
+			if (patterns.get(i).matcher(sbn.getPackageName()).matches())
+				return rule;
+		}
+		
+		return null;
+	}
 
 	@Override
 	public void onNotificationPosted(StatusBarNotification sbn) {
-		vibrate = PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("pref_key_vibrate", false); //want to vibrate if this causes a change in the notification data
-		publishNotificationsToAgenda();
+		String rule = getFirstMatchingRule(sbn);
+		if (rule != null && !PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("pref_rule_"+rule+"_action", "show").equals("ignore")) {
+			vibrate = PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("pref_key_vibrate", false); //want to vibrate if this causes a change in the notification data
+			publishNotificationsToAgenda();
+		}
 	}
 
 	@Override
